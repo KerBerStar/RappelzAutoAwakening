@@ -102,7 +102,7 @@ namespace ConsoleApp3
                 RECT windowRect;
                 GetWindowRect(hWnd, out windowRect);
 
-                int xTop = 930;
+                int xTop = 931;
                 int xBottom = 1235;
                 int yTop = 655;
                 int yBottom = 833;
