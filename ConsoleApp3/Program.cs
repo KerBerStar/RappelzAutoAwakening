@@ -1,16 +1,11 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using IronOcr;
-using System.Text.RegularExpressions;
-using static System.Net.Mime.MediaTypeNames;
-using System.Net.PeerToPeer.Collaboration;
-using System.IO.Ports;
 
 
 namespace ConsoleApp3
@@ -70,7 +65,7 @@ namespace ConsoleApp3
             int EnchantX = 1167;
             int EnchantY = 465;
 
-            ReAwak:
+        ReAwak:
             IntPtr hWnd = FindWindow(null, targetWindowTitle);
             if (hWnd != IntPtr.Zero)
             {
@@ -80,57 +75,58 @@ namespace ConsoleApp3
                 SendMessage(hWnd, WM_LBUTTONDOWN, IntPtr.Zero, lParam);
                 SendMessage(hWnd, WM_LBUTTONUP, IntPtr.Zero, lParam);
                 SendMessage(hWnd, WM_LBUTTONDBLCLK, IntPtr.Zero, lParam);
-                Thread.Sleep(1000);
+                Thread.Sleep(4000);
                 lParam = (IntPtr)((EnchantY << 16) | EnchantX);
                 SendMessage(hWnd, WM_LBUTTONDOWN, IntPtr.Zero, lParam);
                 SendMessage(hWnd, WM_LBUTTONUP, IntPtr.Zero, lParam);
                 Console.WriteLine("Scroll");
-                Thread.Sleep(2500);
-                
+                Thread.Sleep(5500);
+
                 lParam = (IntPtr)((AwakY << 16) | AwakX);
                 SendMessage(hWnd, WM_LBUTTONDOWN, IntPtr.Zero, lParam);
                 SendMessage(hWnd, WM_LBUTTONUP, IntPtr.Zero, lParam);
                 SendMessage(hWnd, WM_LBUTTONDBLCLK, IntPtr.Zero, lParam);
                 Console.WriteLine("Awakening Stone");
-                Thread.Sleep(1000);
+                Thread.Sleep(4000);
                 lParam = (IntPtr)((EnchantY << 16) | EnchantX);
                 SendMessage(hWnd, WM_LBUTTONDOWN, IntPtr.Zero, lParam);
                 SendMessage(hWnd, WM_LBUTTONUP, IntPtr.Zero, lParam);
                 Console.WriteLine("Click Enchant");
-                Thread.Sleep(4000);
-
+                Thread.Sleep(10000);
+            Eblan:
                 RECT windowRect;
                 GetWindowRect(hWnd, out windowRect);
 
-                int xTop = 931;
-                int xBottom = 1235;
-                int yTop = 655;
-                int yBottom = 833;
+                int xTop = 930;
+                int xBottom = 1228;
+                int yTop = 727;
+                int yBottom = 898;
 
 
                 int width = xBottom - xTop;
                 int height = yBottom - yTop;
 
-                int xOffset = 910; // Смещение по горизонтали
-                int yOffset = 426; // Смещение по вертикали
+                int xOffset = 916; // Смещение по горизонтали
+                int yOffset = 434; // Смещение по вертикали
 
-                int xOffset2 = 920; // Смещение по горизонтали
-                int yOffset2 = 445; // Смещение по вертикали
+                int xOffset2 = 918; // Смещение по горизонтали
+                int yOffset2 = 544; // Смещение по вертикали
 
                 int x = windowRect.Left + xOffset;
                 int y = windowRect.Top + yOffset;
 
                 int x2 = windowRect.Left + xOffset2;
                 int y2 = windowRect.Top + yOffset2;
-            Eblan:
+
                 Cursor.Position = new Point(x2, y2);
-                Thread.Sleep(1000);
                 Cursor.Position = new Point(x, y);
-                Thread.Sleep(1000);
+                Cursor.Position = new Point(x + rnd.Next(5), y + rnd.Next(5));
+                Console.WriteLine("Курсор перемещен.");
+                Thread.Sleep(2000);
                 GetWindowRect(hWnd, out windowRect);
                 // Вычислите новые координаты, учитывая смещение и положение окна на экране
                 try
-                { 
+                {
                     using (Bitmap bitmap = new Bitmap(width, height))
                     {
                         using (Graphics graphics = Graphics.FromImage(bitmap))
@@ -142,14 +138,14 @@ namespace ConsoleApp3
                         ReplaceColor(bitmap, "#101111", "#FFFFFF");
                         ReplaceColor(bitmap, "#0C1214", "#000000");
                         ReplaceColor(bitmap, "#454D4D", "#FFFFFF");
-                        
+
 
                         //	#050505
 
                         bitmap.Save("screenshot.png");
                     }
                 }
-                catch 
+                catch
                 {
                     goto Eblan;
                 }
@@ -159,13 +155,14 @@ namespace ConsoleApp3
                 var Ocr = new IronTesseract(); // nothing to configure
                 Ocr.Language = OcrLanguage.English;
                 Ocr.Configuration.WhiteListCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+ 1234567890";
-                
+
                 using (var Input = new OcrInput())
                 {
+                    Thread.Sleep(1000);
                     Input.AddImage(@"screenshot.png");
                     var Result = Ocr.Read(Input);
                     Console.WriteLine(Result.Lines.Count());
-                    if(Result.Lines.Count() < 5)
+                    if (Result.Lines.Count() < 5)
                     {
                         goto Eblan;
                     }
@@ -174,15 +171,15 @@ namespace ConsoleApp3
                     if (CheckStat(Result.Text))
                     {
                         Console.WriteLine("ZBS");
-                        
+
                     }
                     else
                     {
-                        
+
                         Console.WriteLine("GAVNO");
                         goto ReAwak;
                     }
-                   
+
 
                 }
             }
@@ -349,13 +346,14 @@ namespace ConsoleApp3
             Console.WriteLine($"Total Dexterity = {totalAgility.ToString()}");
             Console.WriteLine($"Total Mov Speed = {totalmovSpd.ToString()}");
             Console.WriteLine($"Total Crit Power = {totalPower.ToString()}");
-            
+
             int needStat = 40;
-            if (totalStrength >= needStat || totalInt >= needStat || totalVitality >= needStat || totalWisdom >= needStat || totalmovSpd >= needStat || totalPower >= needStat || totalAgility >= needStat) 
-            {
-                return true;   
-            }
-            if(totalPower >= 20 || totalmovSpd >= 20)
+            /*            if (totalStrength >= needStat || totalInt >= needStat || totalVitality >= needStat || totalWisdom >= needStat || totalmovSpd >= needStat || totalPower >= needStat || totalAgility >= needStat) 
+                        {
+                            return true;   
+                        }*/
+
+            if (totalVitality >= 50)
             {
                 return true;
             }
